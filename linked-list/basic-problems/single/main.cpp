@@ -1,5 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
+#include "solution.cpp"
 
 #define MAX_NODE 10000
 
@@ -49,8 +50,8 @@ static void run() {
 }
 
 int main(void) {
-	//setbuf(stdout, NULL);
-	//freopen("sll_input.txt", "r", stdin);
+	setbuf(stdout, NULL);
+	freopen("sll_input.txt", "r", stdin);
 
 	int T;
 	scanf("%d", &T);
