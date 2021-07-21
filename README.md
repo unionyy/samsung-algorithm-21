@@ -1,1 +1,1 @@
-# samsung-algorithm-21
+# 2021 삼성전자 하계 SW 알고리즘 특강
