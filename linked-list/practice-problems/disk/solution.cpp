@@ -37,13 +37,19 @@ int cntS, cntD;
 
 int T; // Track Size
 NodeS q;
+NodeS* qTail;
 NodeD heads[(MAX - 1) / BUCKET + 1];
 NodeD tails[(MAX - 1) / BUCKET + 1];
 bool tracks[MAX];
 int loc;
 bool DirLeft;
 
+long long cntt;
+long long cnttt;
+
 void init(int track_size, int head){
+    cntt = 0;
+    cnttt = 0;
     T = track_size;
     loc = head;
     DirLeft = true;
@@ -51,17 +57,20 @@ void init(int track_size, int head){
     cntD = 0;
 
     q.Alloc(-1, nullptr);
+    qTail = &q;
 
     for(int i = 0; i < (T - 1) / BUCKET + 1; i++) {
         NodeD* prev = nullptr;
         NodeD* next = nullptr;
-        if(i > 0) prev = &heads[i - 1];
+        if(i > 0) prev = &tails[i - 1];
         if(i < (T - 1) / BUCKET) next = &heads[i + 1];
         heads[i].Alloc(-1, prev, &tails[i]);
         tails[i].Alloc(-2, &heads[i], next);
     }
 
     for(int i = 0; i < T; i++) tracks[i] = false;
+
+    return;
 }
 
 bool FindTgt(int track, NodeD** prev, NodeD** next) {
@@ -95,16 +104,17 @@ bool FindTgt(int track, NodeD** prev, NodeD** next) {
     return false;
 }
 
+
+
 void request(int track){
     tracks[track] = true;
 
-	NodeS* pivot = &q;
-    while(pivot->next) pivot = pivot->next;
-    pivot->next = bufferS[cntS++].Alloc(track, nullptr);
+    qTail->next = bufferS[cntS++].Alloc(track, nullptr);
+    qTail = qTail->next;
 
-    NodeD* pivot2 = &heads[track / BUCKET];
-    while(pivot2->next->track != -2 && pivot2->next->track < track)
-        pivot2 = pivot2->next;
+    int aa = track / BUCKET;
+    NodeD* pivot2 = &heads[aa];
+    while(pivot2->next->track != -2 && pivot2->next->track < track) pivot2 = pivot2->next;
     bufferD[cntD++].Alloc(track, pivot2, pivot2->next);
 
     return;
@@ -119,6 +129,8 @@ int fcfs(){
     q.next = q.next->next;
     tracks[track_no] = false;
     loc = track_no;
+
+    if(!q.next) qTail = &q;
 
 	return track_no;
 }
