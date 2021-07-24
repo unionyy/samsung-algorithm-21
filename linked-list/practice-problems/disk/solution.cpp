@@ -1,6 +1,6 @@
 const int MAX = 100000;
-const int BUCKET = 128;
-const int DIV = 7;
+const int BUCKET = 64;
+const int DIV = 6;
 
 struct NodeS {
     int track;
@@ -45,6 +45,37 @@ bool tracks[MAX];
 int loc;
 bool DirLeft;
 
+NodeD* prevG;
+NodeD* nextG;
+bool validG;
+
+void RemoveD(NodeD* node) {
+    node->Remove();
+    if(node == prevG) {
+        NodeD* pivot = node;
+        while(pivot->prev) {
+            pivot = pivot->prev;
+            if(pivot->track < 0) continue;
+            if(!tracks[pivot->track]) pivot->Remove();
+            else break;
+        }
+        if(pivot->track < 0) prevG = nullptr;
+        else prevG = pivot;
+    }
+    if(node == nextG) {
+        NodeD* pivot = node;
+        while(pivot->next) {
+            pivot = pivot->next;
+            if(pivot->track < 0) continue;
+            if(!tracks[pivot->track]) pivot->Remove();
+            else break;
+        }
+        if(pivot->track < 0) nextG = nullptr;
+        else nextG = pivot;
+    }
+    return;
+}
+
 void init(int track_size, int head){
     T = track_size;
     loc = head;
@@ -66,26 +97,30 @@ void init(int track_size, int head){
 
     for(int i = 0; i < T; i++) tracks[i] = false;
 
+    prevG = nullptr;
+    nextG = nullptr;
+    validG = false;
+
     return;
 }
 
-bool FindTgt(int track, NodeD** prev, NodeD** next) {
-    NodeD* pivot = &heads[track >> DIV];
+bool FindTgt() {
+    NodeD* pivot = &heads[loc >> DIV];
 
     while(pivot->next) {
         pivot = pivot->next;
         if(pivot->track >= 0) {
             if(!tracks[pivot->track]) pivot->Remove();
-            else if(pivot->track >= track) break;
+            else if(pivot->track >= loc) break;
         }
     }
-    if(pivot->track == track) {
-        *prev = pivot;
-        *next = pivot;
+    if(pivot->track == loc) {
+        prevG = pivot;
+        nextG = pivot;
         return true;
     }
-    if(pivot->track < 0) *next = nullptr;
-    else *next = pivot;
+    if(pivot->track < 0) nextG = nullptr;
+    else nextG = pivot;
 
     while(pivot->prev) {
         pivot = pivot->prev;
@@ -94,13 +129,13 @@ bool FindTgt(int track, NodeD** prev, NodeD** next) {
             else break;
         }
     }
-    if(pivot->track < 0) *prev = nullptr;
-    else *prev = pivot;
+    if(pivot->track < 0) prevG = nullptr;
+    else prevG = pivot;
+
+    validG = true;
 
     return false;
 }
-
-
 
 void request(int track){
     tracks[track] = true;
@@ -110,7 +145,20 @@ void request(int track){
 
     NodeD* pivot2 = &heads[track >> DIV];
     while(pivot2->next->track != -2 && pivot2->next->track < track) pivot2 = pivot2->next;
-    bufferD[cntD++].Alloc(track, pivot2, pivot2->next);
+    NodeD* cNode = bufferD[cntD++].Alloc(track, pivot2, pivot2->next);
+
+    if(validG) {
+        if(track == loc) {
+            prevG = cNode;
+            nextG = cNode;
+        } else if(track < loc) {
+            if(!prevG) prevG = cNode;
+            else if(prevG->track < track) prevG = cNode;
+        } else {
+            if(!nextG) nextG = cNode;
+            else if(nextG->track > track) nextG = cNode;
+        }
+    }
 
     return;
 }
@@ -124,6 +172,7 @@ int fcfs(){
     q.next = q.next->next;
     tracks[track_no] = false;
     loc = track_no;
+    validG = false;
 
     if(!q.next) qTail = &q;
 
@@ -133,22 +182,20 @@ int fcfs(){
 int sstf(){
 	int track_no = -1;
 
-    NodeD* prev;
-    NodeD* next;
-    FindTgt(loc, &prev, &next);
+    if(!validG) FindTgt();
 
     NodeD* tgt;
-    if(!prev) tgt = next;
-    else if(!next) tgt = prev;
+    if(!prevG) tgt = nextG;
+    else if(!nextG) tgt = prevG;
     else {
-        int gabN = next->track - loc;
-        int gabP = loc - prev->track;
-        if(gabN < gabP) tgt = next;
-        else tgt = prev;
+        int gabN = nextG->track - loc;
+        int gabP = loc - prevG->track;
+        if(gabN < gabP) tgt = nextG;
+        else tgt = prevG;
     }
 
     track_no = tgt->track;
-    tgt->Remove();
+    RemoveD(tgt);
     tracks[track_no] = false;
     loc = track_no;
 
@@ -158,24 +205,22 @@ int sstf(){
 int look(){
 	int track_no = -1;
 
-    NodeD* prev;
-    NodeD* next;
-    FindTgt(loc, &prev, &next);
+    if(!validG) FindTgt();
 
     NodeD* tgt;
-    if(!prev) {
-        tgt = next;
+    if(!prevG) {
+        tgt = nextG;
         DirLeft = false;
     }
-    else if(!next) {
-        tgt = prev;
+    else if(!nextG) {
+        tgt = prevG;
         DirLeft = true;
     }
-    else if(DirLeft) tgt = prev;
-    else tgt = next;
+    else if(DirLeft) tgt = prevG;
+    else tgt = nextG;
 
     track_no = tgt->track;
-    tgt->Remove();
+    RemoveD(tgt);
     tracks[track_no] = false;
     loc = track_no;
 
@@ -185,19 +230,18 @@ int look(){
 int clook(){
 	int track_no = -1;
 
-    NodeD* prev;
-    NodeD* next;
-    FindTgt(loc, &prev, &next);
+    if(!validG) FindTgt();
 
     NodeD* tgt;
-    if(prev) tgt = prev;
+    if(prevG) tgt = prevG;
     else {
-        FindTgt(T - 1, &prev, &next);
-        tgt = prev;
+        loc = T - 1;
+        FindTgt();
+        tgt = prevG;
     }
 
     track_no = tgt->track;
-    tgt->Remove();
+    RemoveD(tgt);
     tracks[track_no] = false;
     loc = track_no;
 
