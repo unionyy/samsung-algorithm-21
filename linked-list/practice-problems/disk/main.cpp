@@ -102,7 +102,11 @@ static int run(int tc){
 	return correct;
 }
 
+
+#include <time.h>
 int main(){		
+	clock_t start, end;
+	start = clock();
 	setbuf(stdout, NULL);
 	freopen("input.txt", "r", stdin);
 	
@@ -113,10 +117,12 @@ int main(){
 		load_data(tc);
 		init(track_size, track_head);
 		int score = run(tc);		
-		printf("#%d %d\n", tc, score);
+		//printf("#%d %d\n", tc, score);
 		total_score += score;
 	}
 	
-	printf("Total score: %d\n", total_score); 
+	printf("Total score: %d\n", total_score);
+	end = clock();
+    printf("Total time: %dms\n", (end - start)); //결과 출력
 	return 0;
 }
