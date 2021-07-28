@@ -78,10 +78,10 @@ int main() {
         }
         QuickSort(0, N - 1);
 
-        cout << '#' << tc << endl;
+        cout << '#' << tc << "\n";
         for(int n = 0; n < N; n++) {
             if(idxArr[n] == -1) continue;
-            cout << names[idxArr[n]] << endl;
+            cout << names[idxArr[n]] << "\n";
         }
     }
     return 0;
