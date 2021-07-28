@@ -1,31 +1,35 @@
 #include <iostream>
-#include <algorithm>
 using namespace std;
 
 char names[20000][51];
 int sizes[20000];
 int idxArr[20000];
 
-int Compare(int idxA, int idxB) {
-    //int idxA = idxArr[aa];
-    //int idxB = idxArr[bb];
+int Compare(int aa, int bb, int m) {
+    int idxA = idxArr[aa];
+    int idxB = idxArr[bb];
 
-    if(idxB == -1) return 1;
-    else if(idxA == -1) return 0;
+    if(idxB == -1) return 0;
+    else if(idxA == -1) return 1;
 
     char *a = names[idxA];
     char *b = names[idxB];
     int sizeA = sizes[idxA];
     int sizeB = sizes[idxB];
-    if(sizeA < sizeB) return 1;
-    else if(sizeB < sizeA) return 0;
+    if(sizeA < sizeB) return 0;
+    else if(sizeB < sizeA) return 1;
     for(int i = 0; i < sizeA; i++) {
-        if(a[i] < b[i]) return 1;
-        else if(b[i] < a[i]) return 0;
+        if(a[i] < b[i]) return 0;
+        else if(b[i] < a[i]) return 1;
     }
-    //idxArr[bb] = -1;
-    names[idxB][0] = 'z' + 1;
-    return 1;
+    if(aa == m) {
+        idxArr[bb] = -1;
+        return 0;
+    } else {
+        idxArr[aa] = -1;
+        return 1;
+    }
+    
 }
 
 void Swap(int a, int b) {
@@ -42,12 +46,12 @@ void QuickSort(int l, int r) {
     int pivotR = r;
     while(true) {
         while(pivotL < m) {
-            int cmp = Compare(pivotL, m);
+            int cmp = Compare(pivotL, m, m);
             if(cmp == 1) break;
             pivotL++;
         }
         while(pivotR > m) {
-            int cmp = Compare(m, pivotR);
+            int cmp = Compare(m, pivotR, m);
             if(cmp == 1) break;
             pivotR--;
         }
@@ -64,7 +68,7 @@ void QuickSort(int l, int r) {
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
-    freopen("s_input.txt", "r", stdin);
+    //freopen("s_input.txt", "r", stdin);
 
     int T;
     cin >> T;
@@ -78,12 +82,11 @@ int main() {
             sizes[n] = size;
             idxArr[n] = n;
         }
-        //QuickSort(0, N - 1);
-        sort(idxArr, idxArr + N, Compare);
+        QuickSort(0, N - 1);
 
         cout << '#' << tc << "\n";
         for(int n = 0; n < N; n++) {
-            if(names[idxArr[n]][0] == 'z'+1) continue;
+            if(idxArr[n] == -1) continue;
             cout << names[idxArr[n]] << "\n";
         }
     }
