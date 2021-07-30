@@ -4,7 +4,7 @@ using namespace std;
 #define MAXN 100000
 
 int N;
-int parents[MAXN];
+int parents[MAXN][17];
 
 struct Node {
     Node* next;
@@ -30,32 +30,45 @@ struct Child {
 } childPool[MAXN];
 int childCnt;
 Child children[MAXN];
+Child *childtails[MAXN];
 
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
     freopen("input.txt", "r", stdin);
-    parents[0] = -1;
 
     int T;
     cin >> T;
     for(int tc = 1; tc <= T; tc++) {
         cin >> N;
         childCnt = 0;
-        for(int i = 0; i < N; i++) children[i].next = nullptr;
+        for(int i = 0; i < N; i++) {
+            children[i].next = nullptr;
+            childtails[i] = &children[i];
+            for(int j = 0; j < 17; j++) {
+                parents[i][j] = -1;
+            }
+        }
         for(int i = 1; i < N; i++) {
             int p;
             cin >> p;
             p--;
-            parents[i] = p;
-            Child* child = &children[p];
-            while(child->next) child = child->next;
-            child->next = childPool[childCnt++].Alloc(nullptr, i);
+            parents[i][0] = p;
+            childtails[p]->next = childPool[childCnt++].Alloc(nullptr, i);;
+            childtails[p] = childtails[p]->next;
         }
+
+        for(int i = 1; i < N; i++) {
+            for(int j = 1; j < 17; j++) {
+                if(parents[i][j-1] == -1) continue;
+                parents[i][j] = parents[parents[i][j-1]][j-1];
+            }
+        }
+
         nodeCnt = 0;
         Node* head = pool[nodeCnt++].Alloc(nullptr, 0, 0);
         Node* tail = head;
-        int ans = 0;
+        long long ans = 0;
         while(true) {
             int node = head->node;
             int depth = head->depth;
@@ -71,17 +84,29 @@ int main() {
             int depthN = head->depth;
             int cnt = 0;
             if(depth < depthN) {
-                nodeN = parents[nodeN];
+                nodeN = parents[nodeN][0];
                 cnt++;
             }
             while(node != nodeN) {
-                cnt += 2;
-                node = parents[node];
-                nodeN = parents[nodeN];
+                if(parents[node][0] == parents[nodeN][0]) {
+                    cnt += 2;
+                    break;
+                }
+                int i = 1;
+                int mul = 2;
+                while(i < 17) {
+                    if(parents[node][i] == parents[nodeN][i]) break;
+                    mul *= 2;
+                    i++;
+                }
+                cnt += mul;
+                node = parents[node][i-1];
+                nodeN = parents[nodeN][i-1];
             }
             ans += cnt;
         }
 
         cout << '#' << tc << ' ' << ans << "\n";
     }
+    return 0;
 }
