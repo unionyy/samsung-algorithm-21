@@ -13,7 +13,7 @@ void Add(int val) {
         int ppivot = pivot;
         pivot--;
         pivot >> 1;
-        if(heap[pivot] < heap[ppivot]) {
+        if(heap[pivot] < val) {
             heap[ppivot] = heap[pivot];
             heap[pivot] = val;
         } else return;
@@ -27,19 +27,21 @@ int Pop() {
     heap[0] = heap[heapCnt];
     int pivot = 0;
     while(true) {
-        if((pivot << 1) + 2 > heapCnt) {
+        int ppivot = pivot;
+        pivot << 1;
+        pivot++;
+        if(pivot >= heapCnt) {
             break;
-        } else if((pivot << 1) + 2 == heapCnt) {
-            int tmp = heap[pivot];
-            heap[pivot] = heap[(pivot << 1) + 1];
-            heap[pivot << 1 + 1] = tmp;
+        } else if(pivot + 1 == heapCnt) {
+            int tmp = heap[ppivot];
+            heap[ppivot] = heap[pivot];
+            heap[pivot] = tmp;
             break;
         } else {
-            int pivot2 = (heap[(pivot << 1) + 1] > heap[(pivot << 1) + 2]) ? (pivot << 1) + 1 : (pivot << 1) + 2;
+            if(heap[pivot] < heap[pivot + 1]) pivot++;
             int tmp = heap[pivot];
-            heap[pivot] = heap[pivot2];
-            heap[pivot2] = tmp;
-            pivot = pivot2;
+            heap[pivot] = heap[ppivot];
+            heap[ppivot] = tmp;
         }
     }
     return val;
