@@ -6,7 +6,7 @@ int A[10];
 struct Node {
     int left;
     int cnt;
-} nodes[10000];
+} nodes[9000];
 int nodeCnt;
 
 bool Cmp(Node a, Node b) {
@@ -21,7 +21,7 @@ void Add(int left, int cnt) {
     nodeCnt++;
     while(pivot > 0) {
         int ppivot = pivot;
-        pivot = pivot - 1 >> 1;
+        pivot = (pivot - 1) >> 1;
         if(Cmp(nodes[pivot], nodes[ppivot])) return;
         nodes[ppivot] = nodes[pivot];
         nodes[pivot].cnt = cnt;
@@ -38,17 +38,16 @@ Node Pop() {
     int pivot = 0;
     while(true) {
         int ppivot = pivot;
-        pivot << 1;
-        pivot++;
+        pivot = (pivot << 1) + 1;
         if(nodeCnt <= pivot) break;
         if(pivot + 1 == nodeCnt) {
-            if(Cmp(nodes[pivot], nodes[ppivot])) {
+            if(Cmp(nodes[pivot], nodes[nodeCnt])) {
                 nodes[ppivot] = nodes[pivot];
                 nodes[pivot] = nodes[nodeCnt];
             } else break;
         } else {
             if(Cmp(nodes[pivot+1], nodes[pivot])) pivot++;
-            if(Cmp(nodes[pivot], nodes[ppivot])) {
+            if(Cmp(nodes[pivot], nodes[nodeCnt])) {
                 nodes[ppivot] = nodes[pivot];
                 nodes[pivot] = nodes[nodeCnt];
             } else break;
@@ -83,7 +82,7 @@ int main() {
             bool add = false;
             for(int n = 0; n < N; n++) {
                 if(left >= A[n]) {
-                    Add(left / A[n], cnt + left % A[n]);
+                    Add(left / A[n], cnt + (left % A[n]));
                     add = true;
                 }
             }
