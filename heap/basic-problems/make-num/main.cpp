@@ -6,7 +6,7 @@ int A[10];
 struct Node {
     int left;
     int cnt;
-} nodes[1000000];
+} nodes[10000];
 int nodeCnt;
 
 bool Cmp(Node a, Node b) {
@@ -80,10 +80,14 @@ int main() {
                 ans = cnt;
                 break;
             }
-            Add(0, cnt + left);
+            bool add = false;
             for(int n = 0; n < N; n++) {
-                if(left >= A[n]) Add(left / A[n], cnt + left % A[n]);
+                if(left >= A[n]) {
+                    Add(left / A[n], cnt + left % A[n]);
+                    add = true;
+                }
             }
+            if(!add) Add(0, cnt + left);
         }
 
         cout << '#' << tc << ' ' << ans << '\n';
