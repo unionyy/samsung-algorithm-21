@@ -43,16 +43,14 @@ Node Pop() {
         if(nodeCnt <= pivot) break;
         if(pivot + 1 == nodeCnt) {
             if(Cmp(nodes[pivot], nodes[ppivot])) {
-                Node tmp = nodes[pivot];
-                nodes[pivot] = nodes[ppivot];
-                nodes[ppivot] = tmp;
+                nodes[ppivot] = nodes[pivot];
+                nodes[pivot] = nodes[nodeCnt];
             } else break;
         } else {
-            if(Cmp(nodes[pivot], nodes[ppivot+1])) pivot++;
+            if(Cmp(nodes[pivot+1], nodes[pivot])) pivot++;
             if(Cmp(nodes[pivot], nodes[ppivot])) {
-                Node tmp = nodes[pivot];
-                nodes[pivot] = nodes[ppivot];
-                nodes[ppivot] = tmp;
+                nodes[ppivot] = nodes[pivot];
+                nodes[pivot] = nodes[nodeCnt];
             } else break;
         }
     }
