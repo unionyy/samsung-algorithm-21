@@ -22,8 +22,7 @@ TrieNode head;
 
 void Init() {
     nodeCnt = 0;
-    head.cnt = 0;
-    for(int i = 0; i < 26; i++) head.next[i] = nullptr;
+    head.Alloc();
 }
 
 void Add(char* s) {
@@ -43,6 +42,27 @@ void Add(char* s) {
     return;
 }
 
+void Find(int k) {
+    TrieNode* node = &head;
+    if(k > node->cnt) cout << "none";
+
+    while(true) {
+        if(node->end) k--;
+        if(k == 0) break;
+        int left = k;
+        for(int i = 0; i < 26; i++) {
+            k = left;
+            if(node->next[i]) left -= node->next[i]->cnt;
+            if(left <= 0) {
+                node = node->next[i];
+                cout << (char)(i + 'a');
+                break;
+            }
+        }
+    }
+    return;
+}
+
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
@@ -53,7 +73,11 @@ int main() {
         int K;
         cin >> K;
         cin >> str;
+        Init();
         for(int i = 0; str[i]; i++) Add(&str[i]);
+        cout << '#' << tc << ' ';
+        Find(K);
+        cout << '\n';
     }
     return 0;
 }
