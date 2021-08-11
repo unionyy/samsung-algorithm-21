@@ -2,7 +2,7 @@
 using namespace std;
 
 #define MAXN 2000
-#define HASH_SIZE (1 << 30)
+#define HASH_SIZE (1 << 31)
 #define DIV (HASH_SIZE - 1)
 
 int H, W, N, M;
@@ -15,7 +15,7 @@ int CalcMul(int num) {
     for(int i = 1; i < num; i++) {
         rev = (rev << 5) + rev;
     }
-    return (int)rev;
+    return (int) rev & DIV;
 }
 
 int GetHash(int* piv, int num) {
@@ -42,14 +42,14 @@ int main() {
         for(int h = 0; h < H; h++) for(int w = 0; w < W; w++) {
             char a;
             cin >> a;
-            if(a == 'o') myPic[h][w] = 2;
-            else myPic[h][w] = 1;
+            if(a == 'o') myPic[h][w] = 1;
+            else myPic[h][w] = 0;
         }
         for(int n = 0; n < N; n++) for(int m = 0; m < M; m++) {
             char a;
             cin >> a;
-            if(a == 'o') samPic[n][m] = 2;
-            else samPic[n][m] = 1;
+            if(a == 'o') samPic[n][m] = 1;
+            else samPic[n][m] = 0;
         }
 
         // Get My Hash
