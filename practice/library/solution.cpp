@@ -62,7 +62,7 @@ int getTypeIdx(char *type) {
         int num;
         if(*type <= 'Z' && *type >= 'A') num = *type - 'A' + 27;
         else num = *type - 'a' + 1;
-        hash = (hash << 5) + num;
+        hash = (hash << 6) + num;
         type++;
     }
     if(tagHash[hash] == -1) tagHash[hash] = tagCnt++;
@@ -77,7 +77,10 @@ int getTypeIdx(char *type) {
 //         for(int j = 0; j < tagCnt; j++) {
 //             ClassNode *pivot = classes[i][j].next;
 //             while(pivot){
-//                 printf("Section: %d, Tag: %d, Num: %d\n", i, j, pivot->bookNum);
+//                 if(pivot->prev)
+//                     printf("Section: %d, Tag: %d, Num: %d, prev: %d\n", i, j, pivot->bookNum, pivot->prev->bookNum);
+//                 else
+//                     printf("Section: %d, Tag: %d, Num: %d, prev: X\n", i, j, pivot->bookNum);
 //                 pivot = pivot->next;
 //             }
 //         }
@@ -122,8 +125,7 @@ void add(char mName[MAX_NAME_LEN], int mTypeNum, char mTypes[MAX_N][MAX_TAG_LEN]
 
     pivot->bookNum = bookCnt;
     ClassNode *cPivots[5] = {nullptr, nullptr, nullptr, nullptr, nullptr};
-    for(int i = 0; i < 5; i++) {
-        if(cTag[i] == -1) break;
+    for(int i = 0; i < mTypeNum; i++) {
         cPivots[i] = classPool[classCnt++].Alloc(bookCnt, cTag[i], &classes[mSection][cTag[i]], classes[mSection][cTag[i]].next);
     }
     books[bookCnt++].Alloc(pivot, cPivots);
@@ -146,6 +148,7 @@ int moveType(char mType[MAX_TAG_LEN], int mFrom, int mTo)
             if(tmp->next) tmp->next->prev = tmp->prev;
             if(tmp->prev) tmp->prev->next = tmp->next;
             tmp->next = classes[mTo][tmp->tag].next;
+            if(tmp->next) tmp->next->prev = tmp;
             tmp->prev = &classes[mTo][tmp->tag];
             classes[mTo][tmp->tag].next = tmp;
         }
@@ -173,6 +176,7 @@ void moveName(char mName[MAX_NAME_LEN], int mSection)
         if(tmp->next) tmp->next->prev = tmp->prev;
         if(tmp->prev) tmp->prev->next = tmp->next;
         tmp->next = classes[mSection][tmp->tag].next;
+        if(tmp->next) tmp->next->prev = tmp;
         tmp->prev = &classes[mSection][tmp->tag];
         classes[mSection][tmp->tag].next = tmp;
     }
