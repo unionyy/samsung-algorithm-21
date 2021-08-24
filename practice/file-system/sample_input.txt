@@ -1,0 +1,28 @@
+1 100
+26
+1 alice admin
+1 bob guest
+3 admin / readme txt 1
+2 alice / aaa 1 1
+3 alice /aaa/ secret txt 1
+2 bob / bbb 2 1
+3 bob /bbb/ note txt 1
+4 admin /*/*.txt 2
+4 bob /*/*.* 1
+2 alice /aaa/ code 0 1
+3 alice /aaa/code/ main cpp 1
+3 admin /aaa/code/ test cpp 0
+3 alice /aaa/code/ input txt 1
+2 bob /bbb/ code 2 1
+2 bob /aaa/ tmp 1 0
+3 bob /bbb/code/ main java 1
+3 alice /bbb/code/ input txt 1
+4 bob /*/code/main.* 1
+4 alice /*/code/main.* 2
+4 admin /*/*/*.* 2
+1 casey guest
+3 casey /bbb/code/ note txt 1
+2 casey /bbb/ tmp 0 1
+3 casey /bbb/tmp/ note txt 1
+4 casey /*/note.txt 1
+4 bob /bbb/*/note.txt 1
