@@ -139,7 +139,8 @@ void init()
 
     char admin[6] = "admin";
     ll adminHash = getHash(admin);
-    users[userCnt].Alloc(userCnt++, adminHash, adminHash);
+    users[userCnt].Alloc(userCnt, adminHash, adminHash);
+    userCnt++;
 
     rootDir.Alloc(2, 0, 0, 0, nullptr);
 
@@ -149,7 +150,8 @@ void createUser(char userName[], char groupName[])
 {
     ll userHash = getHash(userName);
     ll groupHash = getHash(groupName);
-    users[userCnt].Alloc(userCnt++, userHash, groupHash);
+    users[userCnt].Alloc(userCnt, userHash, groupHash);
+    userCnt++;
 
     return;
 }
